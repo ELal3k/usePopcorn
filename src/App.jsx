@@ -1,4 +1,6 @@
 import { useState } from "react"
+import Box from "./components/Box"
+import NavBar from "./components/NavBar"
 
 const tempMovieData = [
   {
@@ -60,25 +62,15 @@ export default function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <ListBox>
+        <Box>
           <MovieList movies={movies} />
-        </ListBox>
-        <WatchedBox />
+        </Box>
       </Main>
     </>
   )
 }
 
 // ############# NAVBAR COMPONENTS START ################
-
-function NavBar({ children }) {
-  return (
-    <nav className="nav-bar">
-      <Logo />
-      {children}
-    </nav>
-  )
-}
 function Search() {
   const [query, setQuery] = useState("")
   return (
@@ -91,16 +83,6 @@ function Search() {
     />
   )
 }
-
-function Logo() {
-  return (
-    <div className="logo">
-      <span role="img">🍿</span>
-      <h1>usePopcorn</h1>
-    </div>
-  )
-}
-
 function NumResults({ movies }) {
   return (
     <p className="num-results">
@@ -108,30 +90,11 @@ function NumResults({ movies }) {
     </p>
   )
 }
-
 // ############# NAVBAR COMPONENTS END ################
 
 // ############# MAIN  ################
-
 function Main({ children }) {
   return <main className="main">{children}</main>
-}
-
-// ############# LISTBOX COMPONENTS START ################
-
-function ListBox({ children }) {
-  const [isOpen1, setIsOpen1] = useState(true)
-  return (
-    <div className="box">
-      <button
-        className="btn-toggle"
-        onClick={() => setIsOpen1((open) => !open)}
-      >
-        {isOpen1 ? "–" : "+"}
-      </button>
-      {isOpen1 && children}
-    </div>
-  )
 }
 
 function MovieList({ movies }) {
