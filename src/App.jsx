@@ -50,7 +50,28 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
+export default function App() {
+  const [movies, setMovies] = useState(tempMovieData)
+
+  return (
+    <>
+      <NavBar movies={movies} />
+      <Main movies={movies} />
+    </>
+  )
+}
+
 // ############# NAVBAR COMPONENTS START ################
+
+function NavBar({ movies }) {
+  return (
+    <nav className="nav-bar">
+      <Logo />
+      <Search />
+      <NumResults movies={movies} />
+    </nav>
+  )
+}
 function Search() {
   const [query, setQuery] = useState("")
   return (
@@ -73,28 +94,28 @@ function Logo() {
   )
 }
 
-function NumResults() {
+function NumResults({ movies }) {
   return (
     <p className="num-results">
-      Found <strong>X</strong> results
+      Found <strong>{movies?.length}</strong> results
     </p>
   )
 }
 
-function NavBar() {
+// ############# NAVBAR COMPONENTS END ################
+
+function Main({ movies }) {
   return (
-    <nav className="nav-bar">
-      <Logo />
-      <Search />
-      <NumResults />
-    </nav>
+    <main className="main">
+      <ListBox movies={movies} />
+      <WatchedBox />
+    </main>
   )
 }
-// ############# NAVBAR COMPONENTS END ################
 
 // ############# LISTBOX COMPONENTS START ################
 
-function ListBox() {
+function ListBox({ movies }) {
   const [isOpen1, setIsOpen1] = useState(true)
   return (
     <div className="box">
@@ -104,13 +125,12 @@ function ListBox() {
       >
         {isOpen1 ? "–" : "+"}
       </button>
-      {isOpen1 && <MovieList />}
+      {isOpen1 && <MovieList movies={movies} />}
     </div>
   )
 }
 
-function MovieList() {
-  const [movies, setMovies] = useState(tempMovieData)
+function MovieList({ movies }) {
   return (
     <ul className="list">
       {movies?.map((movie) => (
@@ -221,21 +241,4 @@ function WatchedMovie({ movie }) {
   )
 }
 
-function Main() {
-  return (
-    <main className="main">
-      <ListBox />
-      <WatchedBox />
-    </main>
-  )
-}
-
 // ############# APP COMPONENT ################
-export default function App() {
-  return (
-    <>
-      <NavBar />
-      <Main />
-    </>
-  )
-}
