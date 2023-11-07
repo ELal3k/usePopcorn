@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Box from "./components/Box"
 import NavBar from "./components/NavBar"
 
@@ -52,9 +52,17 @@ const tempWatchedData = [
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
+const KEY = "24dd88d3"
+
 export default function App() {
   const [movies, setMovies] = useState(tempMovieData)
   const [watched, setWatched] = useState(tempWatchedData)
+
+  useEffect(() => {
+    fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=matrix`)
+      .then((res) => res.json())
+      .then((data) => setMovies(data.Search))
+  }, [])
 
   return (
     <>
