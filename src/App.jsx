@@ -53,35 +53,37 @@ const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
 const KEY = "24dd88d3"
-const query = "interstellar"
+const query = "adfadgadg"
 
 export default function App() {
   const [movies, setMovies] = useState([])
   const [watched, setWatched] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState("")
 
   useEffect(() => {
+    let res
     async function fetchMovies() {
       try {
         setIsLoading(true)
-        const res = await fetch(
-          `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`
-        )
+        res = await fetch(`https://www.omdbapi.com/?apikey=${KEY}&s=${query}`)
 
-        if (!res.ok)
-          throw new Error(
-            `Something went wrong with fetching movies. Status: ${res.status}`
-          )
+        if (!res.ok) {
+          throw new Error("Something went wrong with fetching movies")
+        }
 
         const data = await res.json()
+        if (data.Response === "False") {
+          throw new Error(data.Error)
+        }
         setMovies(data.Search)
-        setIsLoading(false)
       } catch (err) {
-        console.log(err.mesage)
         setError(err.message)
+      } finally {
+        setIsLoading(false)
       }
     }
+
     fetchMovies()
   }, [])
 
@@ -93,10 +95,9 @@ export default function App() {
       </NavBar>
       <Main>
         <Box>
-          {/* {isLoading ? <Loader /> : <MovieList movies={movies} />} */}
+          {isLoading && <Loader />}
           {!isLoading && !error && <MovieList movies={movies} />}
           {error && <ErrorMessage message={error} />}
-          {isLoading && <Loader />}
         </Box>
         <Box>
           <WatchedSummary watched={watched} />
@@ -112,7 +113,12 @@ function Loader() {
 }
 
 function ErrorMessage({ message }) {
-  return <p className="error">{message}</p>
+  return (
+    <p className="error">
+      <span>⛔️</span>
+      {message}
+    </p>
+  )
 }
 
 // ############# NAVBAR COMPONENTS START ################
@@ -159,7 +165,6 @@ function Movie({ movie }) {
       <h3>{movie.Title}</h3>
       <div>
         <p>
-          <span>🗓</span>
           <span>{movie.Year}</span>
         </p>
       </div>
