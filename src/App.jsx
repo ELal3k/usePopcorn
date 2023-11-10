@@ -3,29 +3,6 @@ import Box from "./components/Box"
 import NavBar from "./components/NavBar"
 import StarRating from "./components/StarRating"
 
-const tempWatchedData = [
-  {
-    imdbID: "tt1375666",
-    Title: "Inception",
-    Year: "2010",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjcxNF5BMl5BanBnXkFtZTcwNTI5OTM0Mw@@._V1_SX300.jpg",
-    runtime: 148,
-    imdbRating: 8.8,
-    userRating: 10,
-  },
-  {
-    imdbID: "tt0088763",
-    Title: "Back to the Future",
-    Year: "1985",
-    Poster:
-      "https://m.media-amazon.com/images/M/MV5BZmU0M2Y1OGUtZjIxNi00ZjBkLTg1MjgtOWIyNThiZWIwYjRiXkEyXkFqcGdeQXVyMTQxNzMzNDI@._V1_SX300.jpg",
-    runtime: 116,
-    imdbRating: 8.5,
-    userRating: 9,
-  },
-]
-
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
 
@@ -51,6 +28,9 @@ export default function App() {
 
   function handleCloseMovieDetails() {
     setSelectedId(null)
+  }
+  function handleAddWatchedMovie(movie) {
+    setWatched((watched) => [...watched, movie])
   }
 
   useEffect(() => {
@@ -110,6 +90,7 @@ export default function App() {
             <MovieDetails
               selectedId={selectedId}
               onCloseMovieDetails={handleCloseMovieDetails}
+              onAddWatchedMovie={handleAddWatchedMovie}
             />
           ) : (
             <>
@@ -136,7 +117,6 @@ function ErrorMessage({ message }) {
   )
 }
 
-// ############# NAVBAR COMPONENTS START ################
 function Search({ query, setQuery }) {
   return (
     <input
@@ -185,7 +165,7 @@ function Movie({ movie, onSelectMovie }) {
   )
 }
 
-function MovieDetails({ selectedId, onCloseMovieDetails }) {
+function MovieDetails({ selectedId, onCloseMovieDetails, onAddWatchedMovie }) {
   const [movie, setMovie] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const {
@@ -200,6 +180,20 @@ function MovieDetails({ selectedId, onCloseMovieDetails }) {
     Genre: genre,
     Director: director,
   } = movie
+
+  function handleAdd() {
+    const newWatchedmovie = {
+      imdbID: selectedId,
+      title,
+      year,
+      poster,
+      imdbRating: Number(imdbRating),
+      runtime: Number(runtime.split(" ")[0]),
+    }
+    onAddWatchedMovie(newWatchedmovie)
+    onCloseMovieDetails()
+  }
+
   useEffect(() => {
     async function fetchMovieDetails() {
       setIsLoading(true)
@@ -239,6 +233,9 @@ function MovieDetails({ selectedId, onCloseMovieDetails }) {
           <section>
             <div className="rating">
               <StarRating maxRating={10} size={24} />
+              <button className="btn-add" onClick={handleAdd} type="button">
+                + Add to list
+              </button>
             </div>
 
             <p>
@@ -296,8 +293,8 @@ function WatchedMoviesList({ watched }) {
 function WatchedMovie({ movie }) {
   return (
     <li key={movie.imdbID}>
-      <img src={movie.Poster} alt={`${movie.Title} poster`} />
-      <h3>{movie.Title}</h3>
+      <img src={movie.poster} alt={`${movie.title} poster`} />
+      <h3>{movie.title}</h3>
       <div>
         <p>
           <span>⭐️</span>
