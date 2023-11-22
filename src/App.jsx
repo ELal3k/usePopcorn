@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react"
 import Box from "./components/Box"
 import NavBar from "./components/NavBar"
 import StarRating from "./components/StarRating"
+import { useMovie } from "./useMovie"
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
@@ -9,16 +10,14 @@ const average = (arr) =>
 const KEY = "24dd88d3"
 
 export default function App() {
-  const [movies, setMovies] = useState([])
-
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState(null)
   const [watched, setWatched] = useState(() => {
     const storedWatched = localStorage.getItem("watched")
     return storedWatched ? JSON.parse(storedWatched) : []
   })
+
+  const { movies, isLoading, error } = useMovie(query)
 
   function handleSelectMovieDetails(id) {
     setSelectedId((selectedId) => {
@@ -52,53 +51,6 @@ export default function App() {
       }
     })
   }, [])
-
-  useEffect(() => {
-    const controller = new AbortController()
-    async function fetchMovies() {
-      try {
-        setIsLoading(true)
-        setError("")
-
-        const res = await fetch(
-          `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
-          {
-            signal: controller.signal,
-          }
-        )
-
-        if (!res.ok) {
-          throw new Error("Something went wrong with fetching movies")
-        }
-
-        const data = await res.json()
-        if (data.Response === "False") {
-          throw new Error("No movies found")
-        }
-        setMovies(data.Search)
-        setError("")
-      } catch (err) {
-        if (err.name !== "AbortError") {
-          setError(err.message)
-        }
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (query.length < 3) {
-      setMovies([])
-      setError("")
-      return
-    }
-
-    fetchMovies()
-
-    return () => {
-      controller.abort()
-      setError("")
-    }
-  }, [query])
 
   return (
     <>
