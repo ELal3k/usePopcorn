@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 import Box from "./components/Box"
 import NavBar from "./components/NavBar"
 import StarRating from "./components/StarRating"
@@ -154,6 +154,11 @@ function ErrorMessage({ message }) {
 }
 
 function Search({ query, setQuery }) {
+  const inputEl = useRef(null)
+
+  useEffect(() => {
+    inputEl.current.focus()
+  }, [])
   return (
     <input
       className="search"
@@ -161,6 +166,7 @@ function Search({ query, setQuery }) {
       placeholder="Search movies..."
       value={query}
       onChange={(e) => setQuery(e.target.value)}
+      ref={inputEl}
     />
   )
 }
