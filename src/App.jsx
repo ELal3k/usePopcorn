@@ -3,6 +3,7 @@ import Box from "./components/Box"
 import NavBar from "./components/NavBar"
 import StarRating from "./components/StarRating"
 import { useMovie } from "./useMovie"
+import { useLocalStorageState } from "./useLocalStorageState"
 
 const average = (arr) =>
   arr.reduce((acc, cur, i, arr) => acc + cur / arr.length, 0)
@@ -12,12 +13,10 @@ const KEY = "24dd88d3"
 export default function App() {
   const [query, setQuery] = useState("")
   const [selectedId, setSelectedId] = useState(null)
-  const [watched, setWatched] = useState(() => {
-    const storedWatched = localStorage.getItem("watched")
-    return storedWatched ? JSON.parse(storedWatched) : []
-  })
 
   const { movies, isLoading, error } = useMovie(query)
+
+  const [watched, setWatched] = useLocalStorageState([], "watched")
 
   function handleSelectMovieDetails(id) {
     setSelectedId((selectedId) => {
@@ -39,10 +38,6 @@ export default function App() {
   function handleDeleteWatchedMovie(id) {
     setWatched((watched) => watched.filter((movie) => movie.imdbID !== id))
   }
-
-  useEffect(() => {
-    localStorage.setItem("watched", JSON.stringify(watched))
-  }, [watched])
 
   useEffect(() => {
     document.addEventListener("keydown", (e) => {
